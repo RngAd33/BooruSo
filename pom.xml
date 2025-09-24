@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.rngad33</groupId>
     <artifactId>booruso</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <name>BooruSo</name>
     <description>booruso</description>
     <properties>
@@ -90,7 +90,6 @@
                 <version>${spring-boot.version}</version>
                 <configuration>
                     <mainClass>com.rngad33.booruso.BoorusoApplication</mainClass>
-                    <skip>true</skip>
                 </configuration>
                 <executions>
                     <execution>
