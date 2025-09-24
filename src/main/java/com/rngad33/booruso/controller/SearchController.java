@@ -29,7 +29,7 @@ public class SearchController {
      * @return
      */
     @GetMapping("/easy")
-    public BaseResponse<List<String>> doEasySearch(@RequestParam String searchText) {
+    public BaseResponse<List<String>> doEasySearch(@RequestParam("searchText") String searchText) {
         ThrowUtils.throwIf(StrUtil.isBlank(searchText), ErrorCodeEnum.NO_PARAMS);
         return ResultUtils.success(searchService.doEasySearch(searchText));
     }
@@ -41,7 +41,7 @@ public class SearchController {
      * @return 原图地址
      */
     @GetMapping("/final")
-    public BaseResponse<String> getOriginalImageUrl(@RequestParam String easyPageUrl) {
+    public BaseResponse<String> getOriginalImageUrl(@RequestParam("easyPageUrl") String easyPageUrl) {
         ThrowUtils.throwIf(StrUtil.isBlank(easyPageUrl), ErrorCodeEnum.NO_PARAMS);
         return ResultUtils.success(searchService.getOriginalImageUrl(easyPageUrl));
     }
