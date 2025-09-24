@@ -1,0 +1,20 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /api
+    session:
+      cookie:
+        domain: localhost
+  
+knife4j:
+  enable: true
+  setting:
+    language: zh-CN
+  openapi:
+    title: BooroSo接口文档
+    group:
+      default:
+        group-name: 默认分组
+        api-rule: package
+        api-rule-resources:
+          - com.rngad33.booruso.controller
