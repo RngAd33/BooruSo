@@ -8,6 +8,7 @@ import com.rngad33.booruso.utils.ResultUtils;
 import com.rngad33.booruso.utils.ThrowUtils;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,7 +17,8 @@ import java.util.List;
 /**
  * 搜索接口
  */
-@RestController("/search")
+@RestController
+@RequestMapping("/search")
 public class SearchController {
 
     @Resource
