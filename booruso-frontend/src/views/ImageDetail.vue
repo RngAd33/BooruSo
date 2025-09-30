@@ -6,14 +6,7 @@
           <el-button @click="goBack" icon="ArrowLeft">上一页</el-button>
           <el-button @click="goHome" icon="House">回到首页</el-button>
           <div class="actions">
-            <el-button 
-              type="primary" 
-              @click="downloadImage"
-              :loading="downloading"
-              icon="Download"
-            >
-              下载图片
-            </el-button>
+            <!-- 下载功能已移除 -->
           </div>
         </div>
       </div>
@@ -23,7 +16,7 @@
       <div class="container">
         <div v-if="loading" class="loading">
           <el-loading-spinner />
-          <p>正在加载图片...</p>
+          <p>少女祈祷中...</p>
         </div>
 
         <div v-else-if="error" class="error">
@@ -46,14 +39,6 @@
           </div>
           
           <div class="image-info">
-            <div class="info-item">
-              <span class="label">缩略图地址：</span>
-              <span class="value">{{ thumbnailUrl }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">原图地址：</span>
-              <span class="value">{{ originalUrl }}</span>
-            </div>
             <div v-if="imageSize" class="info-item">
               <span class="label">图片尺寸：</span>
               <span class="value">{{ imageSize }}</span>
@@ -68,7 +53,7 @@
 <script>
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ArrowLeft, House, Download, Warning } from '@element-plus/icons-vue'
+import { ArrowLeft, House, Warning } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
 export default {
@@ -76,7 +61,6 @@ export default {
   components: {
     ArrowLeft,
     House,
-    Download,
     Warning
   },
   setup() {
@@ -85,7 +69,6 @@ export default {
     
     const imageRef = ref(null)
     const loading = ref(true)
-    const downloading = ref(false)
     const error = ref('')
     const thumbnailUrl = ref('')
     const originalUrl = ref('')
@@ -125,36 +108,7 @@ export default {
       error.value = '图片加载失败'
     }
 
-    const downloadImage = async () => {
-      if (!originalUrl.value) {
-        ElMessage.error('没有可下载的图片')
-        return
-      }
 
-      downloading.value = true
-      
-      try {
-        // 创建一个临时的a标签来下载图片
-        const response = await fetch(originalUrl.value)
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
-        
-        const link = document.createElement('a')
-        link.href = url
-        link.download = `image_${Date.now()}.jpg`
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        
-        window.URL.revokeObjectURL(url)
-        ElMessage.success('图片下载成功')
-      } catch (err) {
-        console.error('下载失败:', err)
-        ElMessage.error('图片下载失败')
-      } finally {
-        downloading.value = false
-      }
-    }
 
     onMounted(() => {
       loadImage()
@@ -163,7 +117,6 @@ export default {
     return {
       imageRef,
       loading,
-      downloading,
       error,
       thumbnailUrl,
       originalUrl,
@@ -172,8 +125,7 @@ export default {
       goHome,
       loadImage,
       onImageLoad,
-      onImageError,
-      downloadImage
+      onImageError
     }
   }
 }
