@@ -36,6 +36,20 @@
         </div>
       </div>
     </div>
+    
+    <!-- 页面底部信息区域 -->
+    <div class="footer-section">
+      <div class="container">
+        <div class="footer-content">
+          <p class="author-info">
+            作者：RngAd33 | 
+            <a href="https://github.com/RngAd33/BooruSo" target="_blank" class="github-link">
+              开源地址
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -83,16 +97,27 @@ export default {
 .home {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+}
+
+.home > .container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 600px;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 .container {
   text-align: center;
-  max-width: 600px;
   width: 100%;
   padding: 0 20px;
+  box-sizing: border-box;
 }
 
 .header {
@@ -139,5 +164,61 @@ export default {
 
 .search-tips p {
   margin: 0;
+}
+
+.footer {
+  margin-top: 40px;
+}
+
+.author-info {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  margin: 0;
+}
+
+.github-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.github-link:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+/* 底部信息区域样式 */
+.footer-section {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 20px 0;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.footer-content {
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.footer-content .author-info {
+  color: #333;
+  font-size: 14px;
+  margin: 0;
+}
+
+.footer-content .github-link {
+  color: #409eff;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-content .github-link:hover {
+  color: #66b1ff;
+  text-decoration: underline;
 }
 </style>

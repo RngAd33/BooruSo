@@ -3,8 +3,8 @@
     <div class="header">
       <div class="container">
         <div class="nav-bar">
-          <el-button @click="goBack" icon="ArrowLeft">返回</el-button>
-          <el-button @click="goHome" icon="House">首页</el-button>
+          <el-button @click="goBack" icon="ArrowLeft">上一页</el-button>
+          <el-button @click="goHome" icon="House">回到首页</el-button>
           <div class="actions">
             <el-button 
               type="primary" 
