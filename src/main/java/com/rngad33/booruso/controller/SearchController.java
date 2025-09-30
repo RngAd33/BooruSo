@@ -33,7 +33,7 @@ public class SearchController {
     @GetMapping("/easy")
     public BaseResponse<List<String>> doEasySearch(@RequestParam("searchText") String searchText,
                                                    @RequestParam("pageNum") int pageNum) {
-        ThrowUtils.throwIf(StrUtil.isBlank(searchText) || pageNum < 0, ErrorCodeEnum.NO_PARAMS);
+        ThrowUtils.throwIf(StrUtil.isBlank(searchText) || pageNum < 0, ErrorCodeEnum.NO_PARAMS, "参数不能为空！");
         return ResultUtils.success(searchService.doEasySearch(searchText, pageNum));
     }
 

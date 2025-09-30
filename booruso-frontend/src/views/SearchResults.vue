@@ -11,7 +11,7 @@
             @keyup.enter="handleSearch"
           >
             <template #prepend>
-              <el-button @click="goHome" icon="House">首页</el-button>
+              <el-button @click="goHome" icon="House">回到首页</el-button>
             </template>
             <template #append>
               <el-button 
@@ -76,6 +76,31 @@
               </div>
             </div>
           </div>
+          
+          <!-- 加载更多指示器 -->
+          <div v-if="loadingMore" class="loading-more">
+            <el-loading-spinner />
+            <p>加载更多图片...</p>
+          </div>
+          
+          <!-- 没有更多数据提示 -->
+          <div v-if="noMoreData && thumbnails.length > 0" class="no-more">
+            <p>已加载全部图片</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 页面底部信息区域 -->
+    <div class="footer-section">
+      <div class="container">
+        <div class="footer-content">
+          <p class="author-info">
+            作者：Dr.YX | 
+            <a href="https://github.com/Dr-YX/booruso" target="_blank" class="github-link">
+              开源地址
+            </a>
+          </p>
         </div>
       </div>
     </div>
@@ -83,7 +108,7 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { House, Warning, Picture, ZoomIn } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -103,36 +128,62 @@ export default {
     
     const searchText = ref('')
     const loading = ref(false)
+    const loadingMore = ref(false)
     const error = ref('')
     const thumbnails = ref([])
+    const pageNum = ref(0)
+    const noMoreData = ref(false)
 
     const goHome = () => {
       router.push('/')
     }
 
-    const handleSearch = async () => {
+    const handleSearch = async (isLoadMore = false) => {
       if (!searchText.value.trim()) {
         ElMessage.warning('请输入搜索关键词')
         return
       }
 
-      loading.value = true
+      if (isLoadMore) {
+        loadingMore.value = true
+      } else {
+        loading.value = true
+        pageNum.value = 0
+        thumbnails.value = []
+        noMoreData.value = false
+      }
+      
       error.value = ''
       
       try {
-        const result = await searchAPI.doEasySearch(searchText.value.trim())
-        thumbnails.value = result || []
+        const result = await searchAPI.doEasySearch(searchText.value.trim(), pageNum.value)
         
-        // 更新URL参数
-        router.replace({
-          path: '/search',
-          query: { q: searchText.value.trim() }
-        })
+        if (result && result.length > 0) {
+          if (isLoadMore) {
+            thumbnails.value = [...thumbnails.value, ...result]
+          } else {
+            thumbnails.value = result
+          }
+          pageNum.value++
+        } else {
+          noMoreData.value = true
+        }
+        
+        // 更新URL参数（仅在新搜索时）
+        if (!isLoadMore) {
+          router.replace({
+            path: '/search',
+            query: { q: searchText.value.trim() }
+          })
+        }
       } catch (err) {
         error.value = err.message || '搜索失败，请重试'
-        thumbnails.value = []
+        if (!isLoadMore) {
+          thumbnails.value = []
+        }
       } finally {
         loading.value = false
+        loadingMore.value = false
       }
     }
 
@@ -163,6 +214,36 @@ export default {
       event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjVmNWY1Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuWbvueJh+WKoOi9veWksei0pTwvdGV4dD48L3N2Zz4='
     }
 
+    // 滚动监听，实现无限加载
+    const handleScroll = () => {
+      if (loadingMore.value || noMoreData.value || loading.value) return
+      
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+      const windowHeight = window.innerHeight
+      const documentHeight = document.documentElement.scrollHeight
+      
+      // 当滚动到距离底部100px时开始加载
+      if (scrollTop + windowHeight >= documentHeight - 100) {
+        handleSearch(true)
+      }
+    }
+
+    onMounted(() => {
+      const query = route.query.q
+      if (query) {
+        searchText.value = query
+        handleSearch()
+      }
+      
+      // 添加滚动监听
+      window.addEventListener('scroll', handleScroll)
+    })
+
+    // 组件卸载时移除监听
+    onUnmounted(() => {
+      window.removeEventListener('scroll', handleScroll)
+    })
+
     // 监听路由参数变化
     watch(() => route.query.q, (newQuery) => {
       if (newQuery) {
@@ -182,8 +263,10 @@ export default {
     return {
       searchText,
       loading,
+      loadingMore,
       error,
       thumbnails,
+      noMoreData,
       goHome,
       handleSearch,
       handleImageClick,
@@ -288,5 +371,45 @@ export default {
 
 .image-item:hover .image-overlay {
   opacity: 1;
+}
+
+.loading-more, .no-more {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.loading-more p, .no-more p {
+  margin: 10px 0 0 0;
+  font-size: 14px;
+}
+
+/* 底部信息区域样式 */
+.footer-section {
+  background: white;
+  border-top: 1px solid #e0e0e0;
+  padding: 20px 0;
+  margin-top: 40px;
+}
+
+.footer-content {
+  text-align: center;
+}
+
+.footer-content .author-info {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.footer-content .github-link {
+  color: #409eff;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-content .github-link:hover {
+  color: #66b1ff;
+  text-decoration: underline;
 }
 </style>
