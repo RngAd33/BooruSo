@@ -27,7 +27,7 @@ public class SearchServiceImpl implements SearchService {
     /**
      * 根 URL
      */
-    private static final String ROOT_URL = "https://safebooru.org/index.php?page=post&s=list&tags=%s";
+    private static final String ROOT_URL = "https://safebooru.org/index.php?page=post&s=list&tags=%s&pid=%d";
 
     /**
      * 获取缩略图地址表
@@ -36,10 +36,10 @@ public class SearchServiceImpl implements SearchService {
      * @return
      */
     @Override
-    public List<String> doEasySearch(String searchText) {
-        ThrowUtils.throwIf(StrUtil.isBlank(searchText), ErrorCodeEnum.NO_PARAMS);
+    public List<String> doEasySearch(String searchText, int pageNum) {
+        ThrowUtils.throwIf(StrUtil.isBlank(searchText) || pageNum < 0, ErrorCodeEnum.NO_PARAMS, "参数不能为空！");
         try {
-            Document doc = Jsoup.connect(String.format(ROOT_URL, searchText)).get();
+            Document doc = Jsoup.connect(String.format(ROOT_URL, searchText, pageNum)).get();
             // 筛选缩略图元素
             List<String> pictures = new LinkedList<>();
             Elements elements = doc.select("img.preview");
