@@ -13,7 +13,7 @@ public interface SearchService {
      * @param searchText 搜索词
      * @return
      */
-    List<String> doEasySearch(String searchText);
+    List<String> doEasySearch(String searchText, int pageNum);
 
     /**
      * 获取原图地址

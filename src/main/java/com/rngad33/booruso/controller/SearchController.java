@@ -31,9 +31,10 @@ public class SearchController {
      * @return
      */
     @GetMapping("/easy")
-    public BaseResponse<List<String>> doEasySearch(@RequestParam("searchText") String searchText) {
-        ThrowUtils.throwIf(StrUtil.isBlank(searchText), ErrorCodeEnum.NO_PARAMS);
-        return ResultUtils.success(searchService.doEasySearch(searchText));
+    public BaseResponse<List<String>> doEasySearch(@RequestParam("searchText") String searchText,
+                                                   @RequestParam("pageNum") int pageNum) {
+        ThrowUtils.throwIf(StrUtil.isBlank(searchText) || pageNum < 0, ErrorCodeEnum.NO_PARAMS);
+        return ResultUtils.success(searchService.doEasySearch(searchText, pageNum));
     }
 
     /**
