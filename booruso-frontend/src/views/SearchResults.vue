@@ -31,7 +31,7 @@
       <div class="container">
         <div v-if="loading" class="loading">
           <el-loading-spinner />
-          <p>正在搜索图片...</p>
+          <p>少女祈祷中...</p>
         </div>
 
         <div v-else-if="error" class="error">
@@ -46,7 +46,8 @@
           <el-icon size="60" color="#909399">
             <Picture />
           </el-icon>
-          <p>未找到相关图片</p>
+          <p v-if="pageNum <= 1">未找到相关图片</p>
+          <p v-else>已经是最后一页了</p>
         </div>
 
         <div v-else class="results">
@@ -80,27 +81,13 @@
           <!-- 加载更多指示器 -->
           <div v-if="loadingMore" class="loading-more">
             <el-loading-spinner />
-            <p>加载更多图片...</p>
+            <p>少女祈祷中...</p>
           </div>
           
           <!-- 没有更多数据提示 -->
           <div v-if="noMoreData && thumbnails.length > 0" class="no-more">
             <p>已加载全部图片</p>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 页面底部信息区域 -->
-    <div class="footer-section">
-      <div class="container">
-        <div class="footer-content">
-          <p class="author-info">
-            作者：Dr.YX | 
-            <a href="https://github.com/Dr-YX/booruso" target="_blank" class="github-link">
-              开源地址
-            </a>
-          </p>
         </div>
       </div>
     </div>
@@ -167,6 +154,13 @@ export default {
           pageNum.value++
         } else {
           noMoreData.value = true
+          // 如果是加载更多时没有数据，且当前已有数据，显示"已加载全部图片"
+          // 如果是首次搜索没有数据，显示"未找到相关图片"或"已经是最后一页了"
+          if (isLoadMore && thumbnails.value.length > 0) {
+            // 已有数据的情况下，没有更多数据了
+          } else if (!isLoadMore && thumbnails.value.length === 0) {
+            // 首次搜索没有找到任何结果
+          }
         }
         
         // 更新URL参数（仅在新搜索时）
