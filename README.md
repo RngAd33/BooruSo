@@ -12,6 +12,13 @@
 - 移除了下载相关代码
 
 ### 技术选型
+#### 前端
+- Vue 3 - 前端框架
+- Vue Router - 路由管理
+- Element Plus - UI组件库
+- Axios - HTTP请求库
+- Vite - 构建工具
+
 #### 后端
 - Spring Boot
 - JSoup
