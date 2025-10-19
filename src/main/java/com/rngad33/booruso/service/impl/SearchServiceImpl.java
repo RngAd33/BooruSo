@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 搜索服务实现
