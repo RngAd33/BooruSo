@@ -68,7 +68,7 @@ public class SearchServiceImpl implements SearchService {
             // 构造详情页地址
             String imageId = easyPageUrl.substring(easyPageUrl.lastIndexOf("?") + 1);
             String detailPageUrl = "https://safebooru.org/index.php?page=post&s=view&id=" + imageId;
-            return this.doGet(detailPageUrl);
+            return doGet(detailPageUrl);
         } catch (IOException e) {
             log.error(e.getMessage());
             return null;
@@ -82,7 +82,7 @@ public class SearchServiceImpl implements SearchService {
      * @return 原图地址
      * @throws IOException
      */
-    private String doGet(String detailPageUrl) throws IOException {
+    private static String doGet(String detailPageUrl) throws IOException {
         ThrowUtils.throwIf(StrUtil.isBlank(detailPageUrl), ErrorCodeEnum.NO_PARAMS);
         Document doc = Jsoup.connect(detailPageUrl).get();
         // 通过"Original image"链接获取
