@@ -1,11 +1,13 @@
 package com.rngad33.booruso.model.enums;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 自定义异常枚举
  */
 @Getter
+@RequiredArgsConstructor
 public enum ErrorCodeEnum {
 
     SUCCESS("OK >>>", 0),
@@ -19,11 +21,6 @@ public enum ErrorCodeEnum {
     SYSTEM_ERROR("————！！系统内部异常！！————", 5000);
 
     private final String msg;
-
     private final int code;
 
-    ErrorCodeEnum(String msg, int code) {
-        this.msg = msg;
-        this.code = code;
-    }
 }

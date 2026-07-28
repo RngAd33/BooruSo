@@ -1,6 +1,7 @@
 package com.rngad33.booruso.controller;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpUtil;
 import com.rngad33.booruso.common.BaseResponse;
 import com.rngad33.booruso.model.enums.ErrorCodeEnum;
 import com.rngad33.booruso.service.SearchService;
@@ -32,9 +33,10 @@ public class SearchController {
      */
     @GetMapping("/easy")
     public BaseResponse<List<String>> doEasySearch(@RequestParam("searchText") String searchText,
-                                                   @RequestParam("pageNum") int pageNum) {
-        ThrowUtils.throwIf(StrUtil.isBlank(searchText) || pageNum < 0, ErrorCodeEnum.NO_PARAMS, "参数不能为空！");
-        return ResultUtils.success(searchService.doEasySearch(searchText, pageNum));
+                                                   @RequestParam("pageNum") int pageNum,
+                                                   @RequestParam("sourceCode") int sourceCode) {
+        ThrowUtils.throwIf(StrUtil.isBlank(searchText) || pageNum < 0 || sourceCode < 0, ErrorCodeEnum.NO_PARAMS, "参数不能为空！");
+        return ResultUtils.success(searchService.doEasySearch(searchText, pageNum, sourceCode));
     }
 
     /**
@@ -44,9 +46,10 @@ public class SearchController {
      * @return 原图地址
      */
     @GetMapping("/final")
-    public BaseResponse<String> getOriginalImageUrl(@RequestParam("easyPageUrl") String easyPageUrl) {
+    public BaseResponse<String> getOriginalImageUrl(@RequestParam("easyPageUrl") String easyPageUrl,
+                                                    @RequestParam("sourceCode") int sourceCode) {
         ThrowUtils.throwIf(StrUtil.isBlank(easyPageUrl), ErrorCodeEnum.NO_PARAMS);
-        return ResultUtils.success(searchService.getOriginalImageUrl(easyPageUrl));
+        return ResultUtils.success(searchService.getOriginalImageUrl(easyPageUrl, sourceCode));
     }
 
 }
