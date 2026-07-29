@@ -108,8 +108,6 @@ export default {
       error.value = '图片加载失败'
     }
 
-
-
     onMounted(() => {
       loadImage()
     })

@@ -27,7 +27,7 @@ public class SearchByDuiTang implements Search {
     @Override
     public List<String> doEasySearch(String searchText, int pageNum, int sourceCode) {
         ThrowUtils.throwIf(StrUtil.isBlank(searchText) || pageNum < 0 || sourceCode < 0, ErrorCodeEnum.NO_PARAMS);
-        int after_id = pageNum * 24;
+        int after_id = (pageNum - 1) * 24;
         String sub_ = StrUtil.toString(RandomUtil.randomNumbers(12));
 
         // 发送请求

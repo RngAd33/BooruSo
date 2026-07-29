@@ -24,7 +24,7 @@ class BoorusoApplicationTests {
 
     @Test
     void test1() {
-        String url = String.format(PathConstant.DUITANG_ROOT_URL, "明日方舟", 24, StrUtil.toString(RandomUtil.randomNumbers(12)));
+        String url = String.format(PathConstant.DUITANG_ROOT_URL, "明日方舟", 0, StrUtil.toString(RandomUtil.randomNumbers(12)));
         String jsonResponse = HttpUtil.get(url);
         //        System.out.println(jsonResponse);
         List<String> pictures = new ArrayList<>();
