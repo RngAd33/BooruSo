@@ -1,0 +1,25 @@
+# 构建输出（避免污染构建上下文、避免复制到镜像）
+target/
+*.jar
+
+# IDE / 编辑器
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.settings/
+.project
+.classpath
+
+# 版本控制
+.git/
+.gitignore
+
+# 文档与示例
+*.md
+!README.md
+
+# 日志与缓存
+logs/
+*.log
