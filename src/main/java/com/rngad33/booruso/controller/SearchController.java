@@ -48,7 +48,7 @@ public class SearchController {
     @GetMapping("/final")
     public BaseResponse<String> getOriginalImageUrl(@RequestParam("easyPageUrl") String easyPageUrl,
                                                     @RequestParam("sourceCode") int sourceCode) {
-        ThrowUtils.throwIf(StrUtil.isBlank(easyPageUrl), ErrorCodeEnum.NO_PARAMS);
+        ThrowUtils.throwIf(StrUtil.isBlank(easyPageUrl) || sourceCode < 0, ErrorCodeEnum.NO_PARAMS);
         return ResultUtils.success(searchService.getOriginalImageUrl(easyPageUrl, sourceCode));
     }
 

@@ -27,7 +27,7 @@ public class SearchByBooru implements Search {
         ThrowUtils.throwIf(StrUtil.isBlank(searchText) || pageNum < 0, ErrorCodeEnum.NO_PARAMS);
         int pid = pageNum * 42;
         try {
-            Document doc = Jsoup.connect(String.format(PathConstant.BUURU_ROOT_URL, searchText, pid)).get();
+            Document doc = Jsoup.connect(String.format(PathConstant.BOORU_ROOT_URL, searchText, pid)).get();
             // 筛选缩略图元素
             List<String> pictures = new LinkedList<>();
             Elements elements = doc.select("img.preview");

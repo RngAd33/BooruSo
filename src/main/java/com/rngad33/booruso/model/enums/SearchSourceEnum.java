@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SearchSourceEnum {
 
-    SAFE_BUURU("Safebooru", 1),
+    SAFE_BOORU("Safebooru", 1),
     DUITANG("堆糖", 2);
 
     private final String source;
@@ -30,6 +30,5 @@ public enum SearchSourceEnum {
         }
         return null;
     }
-
 
 }

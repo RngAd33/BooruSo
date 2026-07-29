@@ -15,7 +15,9 @@
     <div class="content">
       <div class="container">
         <div v-if="loading" class="loading">
-          <el-loading-spinner />
+          <el-icon size="40" class="is-loading" color="#409EFF">
+            <Loading />
+          </el-icon>
           <p>少女祈祷中...</p>
         </div>
 
@@ -53,15 +55,17 @@
 <script>
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ArrowLeft, House, Warning } from '@element-plus/icons-vue'
+import { ArrowLeft, House, Warning, Loading } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { proxyImageUrl } from '../utils/imageProxy'
 
 export default {
   name: 'ImageDetail',
   components: {
     ArrowLeft,
     House,
-    Warning
+    Warning,
+    Loading
   },
   setup() {
     const router = useRouter()
@@ -73,18 +77,23 @@ export default {
     const thumbnailUrl = ref('')
     const originalUrl = ref('')
     const imageSize = ref('')
+    const sourceCode = ref(null)
 
     const goBack = () => {
       router.go(-1)
     }
 
     const goHome = () => {
-      router.push('/')
+      router.push({
+        path: '/',
+        query: { source: sourceCode.value }
+      })
     }
 
     const loadImage = () => {
       const thumbnail = route.query.thumbnail
       const original = route.query.original
+      const source = route.query.source
 
       if (!thumbnail || !original) {
         error.value = '缺少图片参数'
@@ -92,8 +101,10 @@ export default {
         return
       }
 
-      thumbnailUrl.value = thumbnail
-      originalUrl.value = original
+      sourceCode.value = source ? Number(source) : null
+      thumbnailUrl.value = proxyImageUrl(thumbnail)
+      originalUrl.value = proxyImageUrl(original)
+
       loading.value = false
     }
 
@@ -119,6 +130,7 @@ export default {
       thumbnailUrl,
       originalUrl,
       imageSize,
+      sourceCode,
       goBack,
       goHome,
       loadImage,
@@ -215,6 +227,11 @@ export default {
 .value {
   color: #666;
   flex: 1;
+}
+
+.compressed-tag {
+  color: #67c23a;
+  font-weight: 500;
 }
 
 @media (max-width: 768px) {

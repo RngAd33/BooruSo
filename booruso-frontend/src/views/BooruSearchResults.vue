@@ -11,7 +11,14 @@
             @keyup.enter="handleSearch"
           >
             <template #prepend>
-              <el-button @click="goHome" icon="House">回到首页</el-button>
+              <el-select v-model="selectedSource" class="source-select" placeholder="选择图源">
+                <el-option
+                  v-for="item in sourceList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
             </template>
             <template #append>
               <el-button 
@@ -30,7 +37,9 @@
     <div class="content">
       <div class="container">
         <div v-if="loading" class="loading">
-          <el-loading-spinner />
+          <el-icon size="40" class="is-loading" color="#409EFF">
+            <Loading />
+          </el-icon>
           <p>少女祈祷中...</p>
         </div>
 
@@ -80,7 +89,9 @@
           
           <!-- 加载更多指示器 -->
           <div v-if="loadingMore" class="loading-more">
-            <el-loading-spinner />
+            <el-icon size="32" class="is-loading" color="#409EFF">
+              <Loading />
+            </el-icon>
             <p>少女祈祷中...</p>
           </div>
           
@@ -95,11 +106,12 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, onActivated, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { House, Warning, Picture, ZoomIn } from '@element-plus/icons-vue'
+import { House, Warning, Picture, ZoomIn, Loading } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { searchAPI } from '../api/search'
+import { getSourceList, DEFAULT_SOURCE_CODE, getSourceSearchRoute, SourceEnum } from '../enum/sourceEnum'
 
 export default {
   name: 'SearchResults',
@@ -107,7 +119,8 @@ export default {
     House,
     Warning,
     Picture,
-    ZoomIn
+    ZoomIn,
+    Loading
   },
   setup() {
     const router = useRouter()
@@ -120,12 +133,25 @@ export default {
     const thumbnails = ref([])
     const pageNum = ref(0)
     const noMoreData = ref(false)
-
+    const selectedSource = ref(DEFAULT_SOURCE_CODE)
+    const sourceList = getSourceList()
+    const lastSearchTime = ref(0)
+    
     const goHome = () => {
-      router.push('/')
+      router.push({
+        path: '/',
+        query: { source: selectedSource.value }
+      })
     }
 
     const handleSearch = async (isLoadMore = false) => {
+      // 防抖：1秒内最多执行一次搜索
+      const now = Date.now()
+      if (!isLoadMore && now - lastSearchTime.value < 1000) {
+        return
+      }
+      lastSearchTime.value = now
+      
       if (!searchText.value.trim()) {
         ElMessage.warning('请输入搜索关键词')
         return
@@ -143,7 +169,7 @@ export default {
       error.value = ''
       
       try {
-        const result = await searchAPI.doEasySearch(searchText.value.trim(), pageNum.value)
+        const result = await searchAPI.doEasySearch(searchText.value.trim(), pageNum.value, selectedSource.value)
         
         if (result && result.length > 0) {
           if (isLoadMore) {
@@ -154,20 +180,16 @@ export default {
           pageNum.value++
         } else {
           noMoreData.value = true
-          // 如果是加载更多时没有数据，且当前已有数据，显示"已加载全部图片"
-          // 如果是首次搜索没有数据，显示"未找到相关图片"或"已经是最后一页了"
-          if (isLoadMore && thumbnails.value.length > 0) {
-            // 已有数据的情况下，没有更多数据了
-          } else if (!isLoadMore && thumbnails.value.length === 0) {
-            // 首次搜索没有找到任何结果
-          }
         }
         
         // 更新URL参数（仅在新搜索时）
         if (!isLoadMore) {
           router.replace({
             path: '/search',
-            query: { q: searchText.value.trim() }
+            query: { 
+              q: searchText.value.trim(),
+              source: selectedSource.value
+            }
           })
         }
       } catch (err) {
@@ -184,13 +206,14 @@ export default {
     const handleImageClick = async (thumbnailUrl) => {
       try {
         loading.value = true
-        const originalUrl = await searchAPI.getOriginalImageUrl(thumbnailUrl)
+        const originalUrl = await searchAPI.getOriginalImageUrl(thumbnailUrl, selectedSource.value)
         
         router.push({
           path: '/image',
           query: { 
             thumbnail: thumbnailUrl,
-            original: originalUrl
+            original: originalUrl,
+            source: selectedSource.value
           }
         })
       } catch (err) {
@@ -224,33 +247,43 @@ export default {
 
     onMounted(() => {
       const query = route.query.q
+      const sourceQuery = route.query.source
+      if (sourceQuery && Number(sourceQuery) === SourceEnum.DUITANG.code) {
+        router.replace({
+          path: getSourceSearchRoute(SourceEnum.DUITANG.code),
+          query: { q: query }
+        })
+        return
+      }
       if (query) {
         searchText.value = query
+      }
+      if (sourceQuery) {
+        selectedSource.value = Number(sourceQuery)
+      }
+      if (query) {
         handleSearch()
       }
       
-      // 添加滚动监听
       window.addEventListener('scroll', handleScroll)
     })
 
-    // 组件卸载时移除监听
+    onActivated(() => {
+      // 从图片详情页回退时，恢复滚动监听
+      window.addEventListener('scroll', handleScroll)
+    })
+
     onUnmounted(() => {
       window.removeEventListener('scroll', handleScroll)
     })
 
-    // 监听路由参数变化
-    watch(() => route.query.q, (newQuery) => {
-      if (newQuery) {
-        searchText.value = newQuery
-        handleSearch()
-      }
-    }, { immediate: true })
-
-    onMounted(() => {
-      const query = route.query.q
-      if (query) {
-        searchText.value = query
-        handleSearch()
+    // 监听图源选择变化，堆糖时跳转专用页面
+    watch(selectedSource, (newSource) => {
+      if (newSource === SourceEnum.DUITANG.code && searchText.value.trim()) {
+        router.push({
+          path: getSourceSearchRoute(SourceEnum.DUITANG.code),
+          query: { q: searchText.value.trim() }
+        })
       }
     })
 
@@ -261,6 +294,8 @@ export default {
       error,
       thumbnails,
       noMoreData,
+      selectedSource,
+      sourceList,
       goHome,
       handleSearch,
       handleImageClick,
@@ -405,5 +440,9 @@ export default {
 .footer-content .github-link:hover {
   color: #66b1ff;
   text-decoration: underline;
+}
+
+.source-select {
+  width: 120px;
 }
 </style>
