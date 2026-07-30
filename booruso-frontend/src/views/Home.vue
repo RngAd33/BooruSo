@@ -19,6 +19,16 @@
             class="search-input"
             @keyup.enter="handleSearch"
           >
+            <template #prepend>
+              <el-select v-model="selectedSource" class="source-select" placeholder="选择图源">
+                <el-option
+                  v-for="item in sourceList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </template>
             <template #append>
               <el-button 
                 type="primary" 
@@ -54,10 +64,11 @@
 </template>
 
 <script>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { Picture } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { getSourceList, DEFAULT_SOURCE_CODE, getSourceSearchRoute } from '../enum/sourceEnum'
 
 export default {
   name: 'Home',
@@ -66,8 +77,18 @@ export default {
   },
   setup() {
     const router = useRouter()
+    const route = useRoute()
     const searchText = ref('')
     const loading = ref(false)
+    const selectedSource = ref(DEFAULT_SOURCE_CODE)
+    const sourceList = getSourceList()
+
+    onMounted(() => {
+      const sourceQuery = route.query.source
+      if (sourceQuery) {
+        selectedSource.value = Number(sourceQuery)
+      }
+    })
 
     const handleSearch = () => {
       if (!searchText.value.trim()) {
@@ -77,16 +98,21 @@ export default {
       
       loading.value = true
       
-      // 跳转到搜索结果页
+      // 跳转到对应图源的搜索结果页
       router.push({
-        path: '/search',
-        query: { q: searchText.value.trim() }
+        path: getSourceSearchRoute(selectedSource.value),
+        query: { 
+          q: searchText.value.trim(),
+          source: selectedSource.value
+        }
       })
     }
 
     return {
       searchText,
       loading,
+      selectedSource,
+      sourceList,
       handleSearch
     }
   }
@@ -155,6 +181,10 @@ export default {
 
 .search-input :deep(.el-input__wrapper) {
   border-radius: 8px;
+}
+
+.source-select {
+  width: 120px;
 }
 
 .search-tips {

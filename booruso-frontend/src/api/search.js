@@ -33,19 +33,23 @@ api.interceptors.response.use(
 
 export const searchAPI = {
   // 获取缩略图地址表
-  doEasySearch(searchText, pageNum = 0) {
+  doEasySearch(searchText, pageNum = 0, sourceCode) {
     return api.get('/search/easy', {
       params: { 
         searchText,
-        pageNum
+        pageNum,
+        sourceCode
       }
     })
   },
 
   // 获取原图地址
-  getOriginalImageUrl(easyPageUrl) {
+  getOriginalImageUrl(easyPageUrl, sourceCode) {
     return api.get('/search/final', {
-      params: { easyPageUrl }
+      params: {
+        easyPageUrl,
+        sourceCode
+      }
     })
   }
 }
