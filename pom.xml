@@ -7,11 +7,12 @@
     <version>1.0-SNAPSHOT</version>
     <name>BooruSo</name>
     <description>booruso</description>
+
     <properties>
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring-boot.version>3.3.0</spring-boot.version>
+        <spring-boot.version>3.2.12</spring-boot.version>
     </properties>
     <dependencies>
         <dependency>
@@ -27,12 +28,17 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- Jsoup：HTML解析 + 数据抓取 -->
-        <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
+        <!-- Jsoup：HTML解析（仅用于解析，HTTP请求改用OkHttp） -->
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>1.21.2</version>
+        </dependency>
+        <!-- OkHttp：带连接池的HTTP客户端 -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.12.0</version>
         </dependency>
         <!-- https://hutool.cn/docs/index.html#/-->
         <dependency>
